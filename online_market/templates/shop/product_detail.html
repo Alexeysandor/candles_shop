@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Продукт {{product.name}}{% endblock %}
+{% block content %}
+  <div class="detail">
+    <div class="detail__photo">
+      <img src="{{ product.image.url }}">
+    </div>
+    <p class="name"> {{ product.name }} </p>
+    <p> Описание: {{ product.description }}</p>
+    <p class="price">Цена: {{ product.price }} рублей</p>
+      <form action="{% url "shop:cart_add" product.id %}" method="post">
+        {{ cart_product_form }}
+        {% csrf_token %}
+        <p><input type="submit" value="Добавить в корзину"></p>
+      </form>
+    <p class="back"><a href = {% url 'shop:catalog'%} onclick="history.back();" class="detail_text"> Вернуться назад </a></p>
+  </div>
+{%endblock%}

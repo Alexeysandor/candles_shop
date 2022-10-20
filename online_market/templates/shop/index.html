@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{%load static%}
+{% block title %} Главная страница {% endblock %}
+{%block content%}
+<div class="index_page">
+  <div class="index_title">
+    Примеры изготовленных свечей
+  </div>
+  <div class="index_row">
+  {% for image in image_for_example %}
+    <div class="index_column">
+      <img src="{{ image.image.url }}" alt="" class="border">
+    </div>
+  {%endfor%}
+  </div>
+  <div class="index_title">
+    <a class="text" href = {% url 'shop:catalog'%}> Перейти в каталог </a>
+  </div>
+</div>
+{%endblock%}
+

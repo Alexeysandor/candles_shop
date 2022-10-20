@@ -1,0 +1,15 @@
+<html>
+  <head>
+    {%load static%}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+    <title> {% block title %} {% endblock %} </title>
+  </head>
+ <body>
+    <div class="font">
+      {% include 'includes/header.html' %}
+      {% block content %} {%endblock %}
+      {% include 'includes/footer.html' %}
+    </div>
+ </body>
+</html>

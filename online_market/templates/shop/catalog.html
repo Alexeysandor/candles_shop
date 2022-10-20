@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{%load static%}
+{% load cache %}
+{% block title %} Каталог {% endblock %}
+{%block content%}
+  <div class="main_page">
+    <div class="row">
+        {%for product in product%}
+          <div class="column">
+              <img src="{{ product.image.url }}" class="border">
+              <p> <b>{{ product.name }} </b> </p>
+              <p class="cat_name"> <b>Цена:</b> {{ product.price }} рублей </p>
+              <p> <b>Описание</b>: {{product.description}}</p>
+              <p> <a class="text" href="{{ product.get_absolute_url }}"> Подробное описание </a> </p>
+            </div>
+        {% endfor %}
+    </div>
+  </div>
+{% include 'includes/paginator.html' %}
+
+{%endblock%}

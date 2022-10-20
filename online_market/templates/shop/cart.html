@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Корзина {% endblock %}
+{% block content %}
+<div class="index_title">
+</div>
+<div class="main_page">
+  <div class="row">
+  {% if item in cart%}
+  Ваш товар в корзине:
+  {%endif%}
+    {% for item in cart %}
+      {% with product=item.product %}
+      <div class="column">
+        <img src="{{ product.image.url }}" class="border">
+        <p> <b> Название: </b> {{ product.name }} </p>
+        <p> <b>Количество товара в корзине: </b>{{ item.quantity }} </p>
+        <p>
+          <a href="{% url "shop:cart_update" item.product.id %}" class="nav__link">Добавить</a>
+          <a href="{% url "shop:cart_remove" item.product.id %}" class="nav__link">Удалить</a>
+        </p>
+        <div class="header__inner">
+          <p> Цена товара: {{ item.price }} </p>
+          <p>
+            {% if  item.quantity == 1 %}
+              Цена за {{item.quantity}} свечу: {{ item.total_price }} 
+            {% elif  item.quantity <= 4 %}
+              Цена за {{item.quantity}} свечи: {{ item.total_price }}
+            {% elif item.quantity >= 5%}
+              Цена за {{item.quantity}} свечей: {{ item.total_price }}
+            {%endif%}
+          </p>
+        </div>
+      </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+</div>
+<div class="index_title">
+  <p> Итоговая цена: {{ cart.get_total_price }} рублей </p>
+  <a href="{% url "shop:catalog" %}" class="text"> Вернуться в каталог </a>
+</div>
+{% endblock %}
