@@ -47,8 +47,9 @@ class Cart(object):
         product_ids = self.cart.keys()
         # получением объекты product и добавлением их в корзину
         products = Product.objects.filter(pk__in=product_ids)
+        cart = self.cart.copy()
         for product in products:
-            self.cart[str(product.id)]['product'] = product
+            cart[str(product.id)]['product'] = product
         for item in self.cart.values():
             # переводим цену в десятичное число,
             # и находим общую цену за весь товар одного типа
@@ -61,3 +62,8 @@ class Cart(object):
         """подсчитываем сумму всех товаров в корзине"""
         return sum(Decimal(item['price']) * item['quantity'] for item in
                    self.cart.values())
+
+    def clear(self):
+    # удаление корзины из сессии
+        del self.session[settings.CART_SESSION_ID]
+        self.session.modified = True

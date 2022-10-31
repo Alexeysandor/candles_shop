@@ -6,9 +6,10 @@
 </div>
 <div class="main_page">
   <div class="row">
-  {% if item in cart%}
-  Ваш товар в корзине:
-  {%endif%}
+  {% if request.session.cart|length < 1 %}
+    Ваша корзина пустая
+  {% else %}
+  
     {% for item in cart %}
       {% with product=item.product %}
       <div class="column">
@@ -38,6 +39,8 @@
 </div>
 <div class="index_title">
   <p> Итоговая цена: {{ cart.get_total_price }} рублей </p>
+  <a href="{% url "shop:order" %}"> Оформить заказ </a>
   <a href="{% url "shop:catalog" %}" class="text"> Вернуться в каталог </a>
 </div>
+{% endif %}
 {% endblock %}

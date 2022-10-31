@@ -1,13 +1,14 @@
 
 
+import email
 from django.conf import settings
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 
 from .cart import Cart
-from .forms import CartAddProductForm
-from .models import Example, Product
+from .forms import CartAddProductForm, OrderForm
+from .models import Example, Order, Product, OrderItem
 from .utils import paginator
 
 
@@ -92,3 +93,30 @@ def cart_remove(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     cart.remove_product_from_cart(product)
     return redirect('shop:cart_detail')
+
+
+def order_create(request):
+    cart = Cart(request)
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order = form.save()
+            for item in cart:
+                OrderItem.objects.create(order = order, 
+                                         product = item['product'], 
+                                         price = item['price'], 
+                                         quantity = item['quantity'])
+            cart.clear()
+            return render(request, 'shop/order_created.html', {'order': order})
+    else:
+        form = OrderForm
+    return render(request, 'shop/order_create.html',
+                  {'cart': cart, 'form': form})
+
+
+def order_list(request):
+    order = Order.objects.get(email= request.user.email)
+    order_item = OrderItem.objects.get(order=order)
+    return render(request, 'shop/order_list.html', {'order': order,
+                                                    'order_item': order_item})
+                
