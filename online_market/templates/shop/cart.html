@@ -2,14 +2,17 @@
 {% load static %}
 {% block title %} Корзина {% endblock %}
 {% block content %}
-<div class="index_title">
-</div>
 <div class="main_page">
   <div class="row">
   {% if request.session.cart|length < 1 %}
-    Ваша корзина пустая
+  <div class="index_title">
+    <p> Ваша корзина пустая </p>
+    <p> <a href="{% url "shop:catalog" %}" class="nav__link"> Посмотреть товар </a> </p>
+  </div>
   {% else %}
-  
+    <div class="index_title">
+      Ваш товар в корзине:
+    </div>
     {% for item in cart %}
       {% with product=item.product %}
       <div class="column">
@@ -37,9 +40,9 @@
     {% endfor %}
   </div>
 </div>
-<div class="index_title">
+<div class="total_cart">
   <p> Итоговая цена: {{ cart.get_total_price }} рублей </p>
-  <a href="{% url "shop:order" %}"> Оформить заказ </a>
+  <a href="{% url "shop:order" %}" class="text"> Оформить заказ </a>
   <a href="{% url "shop:catalog" %}" class="text"> Вернуться в каталог </a>
 </div>
 {% endif %}

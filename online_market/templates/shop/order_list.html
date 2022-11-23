@@ -1,7 +1,15 @@
 {% extends "base.html" %}
-
-{% block title %}Thank you{% endblock %}
-
+{% block title %}Заказ номер: {{current_order.id}} {% endblock %}
 {% block content %}
-    {{order_item.product.image }}
+{% for order_item in order_item%}
+<div class="detail_order">
+    <div class="detail__photo">
+      <img src="{{ order_item.product.image.url }}" height='200'>
+    </div>
+    <br>{{ order_item.product.name }}
+    <br>Описание: {{ order_item.product.description }}
+    <br>Цена: {{ order_item.product.price }} рублей
+  </div>
+{%endfor%}
+<center><h2><a href="{{ request.user.get_absolute_url }}">Вернуться назад</a></h2></center>
 {% endblock %}

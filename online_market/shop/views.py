@@ -9,6 +9,7 @@ from django.views.decorators.cache import cache_page
 from .cart import Cart
 from .forms import CartAddProductForm, OrderForm
 from .models import Example, Order, Product, OrderItem
+from users.models import CustomUser
 from .utils import paginator
 
 
@@ -63,7 +64,6 @@ def about_us(request):
 def cart_detail(request):
     """функция представления для корзины"""
     cart = Cart(request)
-    request.session.set_expiry(60)
     return render(request, 'shop/cart.html', {'cart': cart})
 
 
@@ -107,6 +107,8 @@ def order_create(request):
                                          price = item['price'], 
                                          quantity = item['quantity'])
             cart.clear()
+            orders = request.user.orders_count + 1
+            CustomUser.object.filter(email= request.user.email).update(orders_count=orders)
             return render(request, 'shop/order_created.html', {'order': order})
     else:
         form = OrderForm
@@ -114,9 +116,10 @@ def order_create(request):
                   {'cart': cart, 'form': form})
 
 
-def order_list(request):
-    order = Order.objects.get(email= request.user.email)
-    order_item = OrderItem.objects.get(order=order)
-    return render(request, 'shop/order_list.html', {'order': order,
+def order_detail(request, order_id):
+    current_order = get_object_or_404(Order,
+                                      id=order_id)
+    order_item = OrderItem.objects.filter(order=current_order).all()
+    return render(request, 'shop/order_list.html', {'current_order': current_order,
                                                     'order_item': order_item})
                 

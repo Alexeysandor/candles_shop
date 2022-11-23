@@ -1,0 +1,6 @@
+{% autoescape off %}
+Ссылка для подтверждения пароля:
+{{ protocol }}://{{ domain }}{% url 'email_verification' uidb64=uid token=token %}
+
+
+{% endautoescape %}

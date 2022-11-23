@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load user_filters %}
 {%load static%}
 {% block title %} Войти {% endblock %}
 {% block content %}
@@ -7,24 +6,24 @@
   {% csrf_token %}
   <div class="login_title">
     <div class="login">
-    <p>
-      <div class="login_field">
-        <label class="form-label">{{ form.username.label }}</label>
-        {{ form.username }}
-      </div>
-    </p>
-    <p>
-      <label class="form-label">{{ form.password.label }}</label>
-      {{ form.password }}
-    </p>
-    {% if form.errors %}
+        <br>{{form.username.label}}
+        <br>{{form.username}}
+        {% if form.username.errors %}
+          <br>{{ form.username.errors }}
+        {% endif %}
+        <br>{{form.password.label}}
+        <br>{{form.password}}
+        {% if form.password.errors %}
+        <br>{{ form.password.errors }}
+      {% endif %}
+    {% comment %} {% if form.errors %}
       <div class="alert alert-primary" role="alert">
-        Ошибка: Неверный логин или пароль!
+        Неверный логин или пароль!
       </div>
-    {% endif %}
-    <button type="submit" class="button">
+    {% endif %} {% endcomment %}
+    <br><p> <button type="submit" class="button">
       Войти
-    </button>
+    </button> </p>
     <p class="reset_pass"> Забыли пароль? </p>
     </div>
   </div>

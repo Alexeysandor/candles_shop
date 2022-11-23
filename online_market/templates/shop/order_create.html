@@ -1,20 +1,41 @@
 {% extends 'base.html' %}
 {%load static%}
-{% block title %} Главная страница {% endblock %}
+{% block title %} Заказ {% endblock %}
 {%block content%}
 <div class="index_page">
-  <div class="index_title">
-    Ваш заказ:
-    {% for item in cart %}
-                <li>
-                    {{ item.quantity }}x {{ item.product.name }}
-                    <span>${{ item.total_price }}</span>
-                </li>
-    {% endfor %}
-    <form action="." method="post" class="order-form">
-        {{ form.as_p }}
-        <p><input type="submit" value="Place order"></p>
-        {% csrf_token %}
+  <div class="block1">
+    <form action="." method="post">
+      {% csrf_token %}
+      {% for fields in form%}
+        <br>{{fields.label}}
+        {% if from.errors %}
+          {{ form.email.errors }}
+        {% endif %}
+        <br>{{fields}}
+      {% endfor %}
+      <p> <button type="submit" class="button">
+        Оформить заказ
+  
+      </button> </p>
     </form>
   </div>
+  <div class="block2">
+    <div class="order_title">
+      Ваш заказ:
+    </div>
+    {% for item in cart %}
+      {% with product=item.product %}
+      <div class="order_border">
+        Название: {{ product.name }} 
+        <br> Количество: {{ product.quantity }}x
+        <br> Количество: {{ product.quantity }}x
+        <br> Количество: {{ item.quantity }}x
+        <br> Количество: {{ item.quantity }}x
+        <br> Количество: {{ item.quantity }}x
+        <br> {{product.description}}
+      </div>
+      {% endwith %}
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

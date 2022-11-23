@@ -15,6 +15,42 @@ class CartAddProductForm(forms.Form):
 
 
 class OrderForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label='Имя',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': 'Иван'}))
+
+    second_name = forms.CharField(
+        label='Фамилия',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': 'Иванов'}))
+
+    phone_number = forms.CharField(
+        label='Номер телефона',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': '+79781234567'}))
+    
+    email = forms.EmailField(
+        label='Электронная почта',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': 'example@gmail.com'}),
+        error_messages={'invalid': 'Email: Неверно заполнено'})
+    
+    city = forms.CharField(
+        label='Город',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': 'Москва'}))
+
+    address = forms.CharField(
+        label='Адрес',
+        max_length=50,
+        widget=forms.TextInput(attrs={'placeholder': 'Красная площадь'}))
+
+    postal_code = forms.CharField(
+        label='Почтовый индекс',
+        max_length=6,
+        widget=forms.TextInput(attrs={'placeholder': '230035'}))
+
     class Meta:
         model = Order
-        fields = ('first_name', 'second_name', 'phone_number', 'email', 'address', 'postal_code', 'city')
+        fields = ('first_name', 'second_name', 'phone_number', 'email', 'city', 'address', 'postal_code')
