@@ -29,7 +29,6 @@ class OrderForm(forms.ModelForm):
         label='Номер телефона',
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': '+79781234567'}))
-    
     email = forms.EmailField(
         label='Электронная почта',
         max_length=50,

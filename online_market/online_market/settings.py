@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'online_market.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'candles_market',
+        'NAME': 'online_market',
         'USER': 'Admin',
         'PASSWORD': 'Admin',
         'HOST': '127.0.0.1',

@@ -31,6 +31,7 @@ class CustomCommonPasswordValidator(CommonPasswordValidator):
             raise ValidationError("Ваш пароль слишком простой",
                                   code='password_too_common')
 
+
 class CustomUserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
 
     def validate(self, password, user=None):

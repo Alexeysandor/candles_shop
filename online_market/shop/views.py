@@ -102,13 +102,14 @@ def order_create(request):
         if form.is_valid():
             order = form.save()
             for item in cart:
-                OrderItem.objects.create(order = order, 
+                OrderItem.objects.create(
+                                         order = order, 
                                          product = item['product'], 
                                          price = item['price'], 
                                          quantity = item['quantity'])
             cart.clear()
             orders = request.user.orders_count + 1
-            CustomUser.object.filter(email= request.user.email).update(orders_count=orders)
+            CustomUser.objects.filter(email= request.user.email).update(orders_count=orders)
             return render(request, 'shop/order_created.html', {'order': order})
     else:
         form = OrderForm

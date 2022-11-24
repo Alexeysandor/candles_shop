@@ -2,15 +2,24 @@
 {%load static%}
 {% block title %} Заказ {% endblock %}
 {%block content%}
+{% if user.email == request.user.email%}
 <div class="index_page">
   <div class="block1">
     <br>Имя аккаунта: {{user.username}}
+    {% if request.user.city is None%}
+    Ваш профиль ещё не заполнен. <a href="{% url "users:profile_edit" request.user%} "> Заполнить? </a>
+    {%else%}
     <br>Количество заказов пользователя {{user.orders_count}}
-    
-
+    <br> Имя: {{user.first_name}}
+    <br> Фамилия: {{user.second_name}}
+    <br> Номер телефона: {{user.phone_number}}
+    <br> Город проживания: {{user.city}}
+    <br> Адрес проживания: {{user.address}}
+    <br> Индекс: {{user.postal_code}}
+    <br><a href="{% url "users:profile_edit" request.user%} "> Желаете что-то изменить?</a>
+    {%endif%}
   </div>
   <div class="block2">
-    {% if user.email == request.user.email%}
       <div class="order_border">
         <center> <h3> История заказов: </h3> </center>
         {% for order in order%}
