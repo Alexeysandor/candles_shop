@@ -42,6 +42,7 @@ class Order(models.Model):
     CHOICES = [('Оформлен', 'Заказ оформлен'),
                ('В процессе', 'Заказ готовится'),
                ('Готов', 'Заказ готов')]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     second_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=100)

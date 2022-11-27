@@ -20,7 +20,7 @@ class SignUp(CreateView):
 def profile(request, username):
     current_username = get_object_or_404(CustomUser, username=username)
 
-    order = Order.objects.filter(email=request.user.email).all()
+    order = Order.objects.filter(user=request.user.id).all()
     return render(request, 'users/profile.html', {'user': current_username,
                                                   'order': order})
 

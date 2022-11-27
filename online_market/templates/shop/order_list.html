@@ -11,5 +11,6 @@
     <br>Цена: {{ order_item.product.price }} рублей
   </div>
 {%endfor%}
+<a href="{{ request.user.get_absolute_url}}"> Удалить заказ {{delete_order}} </a>
 <center><h2><a href="{{ request.user.get_absolute_url }}">Вернуться назад</a></h2></center>
 {% endblock %}

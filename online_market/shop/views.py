@@ -97,10 +97,20 @@ def cart_remove(request, product_id):
 
 def order_create(request):
     cart = Cart(request)
+    initial_dict = {
+            'first_name': request.user.first_name,
+            'second_name': request.user.second_name,
+            'phone_number': request.user.phone_number,
+            'city': request.user.city,
+            'address': request.user.address,
+            'postal_code': request.user.postal_code
+        }
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
-            order = form.save()
+            order = form.save(commit=False)
+            order.user = request.user
+            order.save()
             for item in cart:
                 OrderItem.objects.create(
                                          order = order, 
@@ -112,7 +122,7 @@ def order_create(request):
             CustomUser.objects.filter(email= request.user.email).update(orders_count=orders)
             return render(request, 'shop/order_created.html', {'order': order})
     else:
-        form = OrderForm
+        form = OrderForm(initial=initial_dict)
     return render(request, 'shop/order_create.html',
                   {'cart': cart, 'form': form})
 
@@ -120,7 +130,12 @@ def order_create(request):
 def order_detail(request, order_id):
     current_order = get_object_or_404(Order,
                                       id=order_id)
+    delete_order = current_order.delete()
+    if delete_order:
+        orders = request.user.orders_count - 1
+        CustomUser.objects.filter(email= request.user.email).update(orders_count=orders)
     order_item = OrderItem.objects.filter(order=current_order).all()
     return render(request, 'shop/order_list.html', {'current_order': current_order,
+                                                    'delete_order': delete_order,
                                                     'order_item': order_item})
                 
