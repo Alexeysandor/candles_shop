@@ -1,14 +1,23 @@
 from django.db import models
 from django.urls import reverse
-
+from users.models import CustomUser
 
 class Product(models.Model):
     """модель товара: свечей"""
-    name = models.CharField(max_length=100, db_index=True, verbose_name='Название товара')
-    slug = models.SlugField(max_length=100, db_index=True, verbose_name='url товара')
+    name = models.CharField(
+        max_length=100,
+        db_index=True,
+        verbose_name='Название товара')
+    slug = models.SlugField(
+        max_length=100,
+        db_index=True,
+        verbose_name='url товара')
     description = models.TextField(verbose_name='Описание товара')
     image = models.ImageField(upload_to='products/', blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена товара')
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Цена товара')
     available = models.BooleanField(default=True, verbose_name='Наличие товара')
 
     class Meta:
@@ -30,6 +39,10 @@ class Example(models.Model):
 
 
 class Order(models.Model):
+    CHOICES = [('Оформлен', 'Заказ оформлен'),
+               ('В процессе', 'Заказ готовится'),
+               ('Готов', 'Заказ готов')]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     second_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=100)
@@ -39,9 +52,13 @@ class Order(models.Model):
     city = models.CharField(max_length=100)
     created = models.DateTimeField(auto_now_add=True)
     paid = models.BooleanField(default=False)
+    order_status = models.CharField(
+        default='Заказ оформлен',
+        choices=CHOICES,
+        max_length=25)
 
     class Meta:
-        ordering =('-created',)
+        ordering = ('created',)
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
@@ -50,11 +67,21 @@ class Order(models.Model):
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
+    
+    def get_absolute_url(self):
+        return reverse('shop:order_detail',
+                       args=[self.id])
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, related_name='order_items', on_delete=models.CASCADE)
+    order = models.ForeignKey(
+        Order,
+        related_name='items',
+        on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Product,
+        related_name='order_items',
+        on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(default=1)
 

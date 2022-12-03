@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{%load static%}
+{% block title %} Войти {% endblock %}
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <div class="login_title">
+      <div class="login">
+        {{form.as_p}}
+        <br><p> <button type="submit" class="button">
+            Сохранить
+          </button> </p>
+      </div>
+    </div>
+</form>
+{% endblock %}

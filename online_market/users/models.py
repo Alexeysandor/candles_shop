@@ -6,20 +6,22 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=50, default='')
-    first_name = models.CharField(max_length=50, db_index=True, default='')
-    second_name = models.CharField(max_length=50, db_index=True, default='')
-    patronymic = models.CharField(max_length=50, blank=True)
-    phone_number = models.CharField(max_length=15, blank=True, default='')
-    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=50, default='', unique=True, verbose_name='Логин')
+    email = models.EmailField(unique=True, verbose_name= 'Адрес электронной почты')
+    first_name = models.CharField(max_length=50, default='', verbose_name= 'Имя')
+    second_name = models.CharField(max_length=50, default='', verbose_name= 'Фамилия')
+    phone_number = models.CharField(max_length=15, default='')
+    address = models.CharField(max_length=250, default='')
+    postal_code = models.CharField(max_length=20, default='')
+    city = models.CharField(max_length=100, default='')
+    orders_count = models.IntegerField(default=0)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     register_date = models.DateTimeField(default=timezone.now)
-    orders_count = models.IntegerField(default=0)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    object = CustomUserManager()
+    objects = CustomUserManager()
 
     class Meta:
         index_together = (('id', 'username'),)
@@ -30,3 +32,5 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+    

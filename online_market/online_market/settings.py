@@ -32,7 +32,6 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -65,7 +64,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'shop.apps.ShopConfig',
     'users.apps.UsersConfig',
-    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -107,7 +105,7 @@ WSGI_APPLICATION = 'online_market.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'candles_market',
+        'NAME': 'online_market',
         'USER': 'Admin',
         'PASSWORD': 'Admin',
         'HOST': '127.0.0.1',
@@ -120,17 +118,21 @@ DATABASES = {
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    {   
+        'NAME': 'users.validators.CustomUserAttributeSimilarityValidator',
+        # 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {   
+        'NAME': 'users.validators.CustomMinimumLengthPasswordValidator',
+        # 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'users.validators.CustomCommonPasswordValidator',
+        # 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'users.validators.CustomNumericPasswordValidator',
+        # 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -162,4 +164,10 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'shop:home'
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
+EMAIL_HOST = 'smtp.email-domain.com'
+EMAIL_HOST_USER = 'test@gmail.com'
+EMAIL_HOST_PASSWORD = '123'

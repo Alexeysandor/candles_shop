@@ -1,6 +1,5 @@
 from django.contrib import admin
-
-from .models import Product, Example
+from .models import Product, Example, Order
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -13,5 +12,11 @@ class ExampleAdmin(admin.ModelAdmin):
     list_display = ['image', ]
 
 
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id','order_status',)
+    fields = ('email','order_status',)
+
+
 admin.site.register(Example, ExampleAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Order, OrderAdmin)

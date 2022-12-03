@@ -1,14 +1,35 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block title %} Регистрация {% endblock %}
-{% block content %}
-{{ user.username}}
-{% if request.user.is_staff %}
-<a class="nav__link" href={% url 'users:profile' user%} > Личный кабинет </a> 
-тест1
-{%else%}
-тест2
-{% endif %}
-{{ user.first_name}}
-<a href="{% url "shop:order_list"%}"> Ваши заказы </a>
+{%load static%}
+{% block title %} Заказ {% endblock %}
+{%block content%}
+
+<div class="index_page">
+  <div class="block1">
+    <br>Имя аккаунта: {{user.username}}
+    {% if user.city|length == 0 and user.address|length  == 0%}
+
+    <br>Ваш профиль ещё не заполнен. <a href="{% url "users:profile_edit" request.user%} "> Заполнить? </a>
+    {%else%}
+    <br>Количество заказов пользователя {{user.orders_count}}
+    <br> Имя: {{user.first_name}}
+    <br> Фамилия: {{user.second_name}}
+    <br> Номер телефона: {{user.phone_number}}
+    <br> Город проживания: {{user.city}}
+    <br> Адрес проживания: {{user.address}}
+    <br> Индекс: {{user.postal_code}}
+    <br><a href="{% url "users:profile_edit" request.user%} "> Желаете что-то изменить?</a>
+    {%endif%}
+  </div>
+  <div class="block2">
+      <div class="order_border">
+        <center> <h3> История заказов: </h3> </center>
+        {% for order in order%}
+          <br> Заказ номер: <a href="{{ order.get_absolute_url }}"> {{order.id}}</a> | статус заказа: {{order.order_status}}
+        {% endfor %}
+
+      </div>
+
+  </div>
+</div>
+
 {% endblock %}

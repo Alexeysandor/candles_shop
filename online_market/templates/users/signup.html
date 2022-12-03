@@ -6,8 +6,13 @@
     <div class="login_title">
       <div class="signup">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Зарегистрироваться" href="{% url "users:register_done" %}">
+        {%for fields in form%}
+
+        <br> {{fields.label}}
+        <br> {{fields}}
+        {{fields.errors}}
+        {% endfor %}
+        <br><p> <input type="submit" class="button"value="Зарегистрироваться" href="{% url "users:register_done" %}"> </p>
       </div>
     </div>
   </form>
