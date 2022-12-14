@@ -16,15 +16,10 @@
         {% if form.password.errors %}
         <br>{{ form.password.errors }}
       {% endif %}
-    {% comment %} {% if form.errors %}
-      <div class="alert alert-primary" role="alert">
-        Неверный логин или пароль!
-      </div>
-    {% endif %} {% endcomment %}
     <br><p> <button type="submit" class="button">
       Войти
     </button> </p>
-    <p class="reset_pass"> Забыли пароль? </p>
+    <p class="reset_pass"><a href="{% url "users:password_reset" %}"> Забыли пароль?</a> </p>
     </div>
   </div>
 </form>

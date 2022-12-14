@@ -58,5 +58,6 @@ def loginUser(request):
     return render(request, 'users/login.html', {'form': form})
 
 
+
 class RegisterDone(TemplateView):
     template_name = 'users/register_done.html'
