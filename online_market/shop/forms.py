@@ -1,6 +1,8 @@
 from django import forms
+
 from .models import Order
 
+# генератор для добавления товара в количестве от 1 до 20
 PRODUCT_QUANTITY_CHOICES = [(i, str(i)) for i in range(1, 21)]
 
 
@@ -8,13 +10,13 @@ class CartAddProductForm(forms.Form):
     """форма для добавления товара в корзину"""
     quantity = forms.TypedChoiceField(choices=PRODUCT_QUANTITY_CHOICES,
                                       coerce=int, label='Количество')
-    """проверка на то, что товар попал в корзину, скрыто для юзеров"""
     update = forms.BooleanField(required=False,
                                 initial=False,
                                 widget=forms.HiddenInput)
 
 
 class OrderForm(forms.ModelForm):
+    """форма оформления заказа"""
     first_name = forms.CharField(
         label='Имя',
         max_length=50,
@@ -29,12 +31,13 @@ class OrderForm(forms.ModelForm):
         label='Номер телефона',
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': '+79781234567'}))
+
     email = forms.EmailField(
         label='Электронная почта',
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': 'example@gmail.com'}),
         error_messages={'invalid': 'Email: Неверно заполнено'})
-    
+
     city = forms.CharField(
         label='Город',
         max_length=50,
@@ -52,4 +55,5 @@ class OrderForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ('first_name', 'second_name', 'phone_number', 'email', 'city', 'address', 'postal_code')
+        fields = ('first_name', 'second_name', 'phone_number', 'email',
+                  'city', 'address', 'postal_code')

@@ -165,9 +165,15 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_URL = 'users:login'
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
-EMAIL_HOST = 'smtp.email-domain.com'
-EMAIL_HOST_USER = 'test@gmail.com'
-EMAIL_HOST_PASSWORD = '123'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
+DEFAULT_FROM_EMAIL = 'mail@mail.mail'
+
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'mail@mail.mail'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+

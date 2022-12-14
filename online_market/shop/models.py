@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
+
 from users.models import CustomUser
+
 
 class Product(models.Model):
     """модель товара: свечей"""
@@ -8,16 +10,21 @@ class Product(models.Model):
         max_length=100,
         db_index=True,
         verbose_name='Название товара')
+
     slug = models.SlugField(
         max_length=100,
         db_index=True,
         verbose_name='url товара')
+
     description = models.TextField(verbose_name='Описание товара')
+
     image = models.ImageField(upload_to='products/', blank=True)
+
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name='Цена товара')
+
     available = models.BooleanField(default=True, verbose_name='Наличие товара')
 
     class Meta:
@@ -39,6 +46,7 @@ class Example(models.Model):
 
 
 class Order(models.Model):
+    """модель оформления заказов"""
     CHOICES = [('Оформлен', 'Заказ оформлен'),
                ('В процессе', 'Заказ готовится'),
                ('Готов', 'Заказ готов')]
@@ -67,13 +75,14 @@ class Order(models.Model):
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
-    
+
     def get_absolute_url(self):
         return reverse('shop:order_detail',
                        args=[self.id])
 
 
 class OrderItem(models.Model):
+    """модель товаров в заказе"""
     order = models.ForeignKey(
         Order,
         related_name='items',

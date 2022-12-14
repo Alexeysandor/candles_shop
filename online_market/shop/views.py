@@ -1,24 +1,19 @@
-
-
-import email
 from django.conf import settings
-from django.shortcuts import get_object_or_404, render, redirect
 from django.core.cache import cache
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.cache import cache_page
 
+from users.models import CustomUser
 from .cart import Cart
 from .forms import CartAddProductForm, OrderForm
-from .models import Example, Order, Product, OrderItem
-from users.models import CustomUser
+from .models import Example, Order, OrderItem, Product
 from .utils import paginator
 
 
 
 def index(request):
     """функция представления главной страницы"""
-    # выгружае товар, который в наличии
     product = Product.objects.filter(available=True)
-    # выгружаем фото примеров с использованием модели
     image_for_example = Example.objects.all()
     return render(request, 'shop/index.html', {'product': product,
                                                'image_for_example':
@@ -35,19 +30,14 @@ def product_detail(request, slug):
         product = cache.get(product_id)
     else:
         product = product_id
-        cache.set(
-            product_id, product, 60
-        )
-    return render(request,
-                  'shop/product_detail.html',
+        cache.set(product_id, product, 60)
+    return render(request, 'shop/product_detail.html',
                   {'product': product,
                    'cart_product_form': cart_product_form})
 
 
-
 def catalog(request):
     """функция представления для каталого товаров"""
-    # выгружаем все продукты и подключаем паджинатор
     product_list = Product.objects.all()
     page_number = request.GET.get('page')
     product = paginator(product_list,
@@ -96,6 +86,7 @@ def cart_remove(request, product_id):
 
 
 def order_create(request):
+    """функция представления страницы оформления заказа"""
     cart = Cart(request)
     initial_dict = {
             'first_name': request.user.first_name,
@@ -113,13 +104,14 @@ def order_create(request):
             order.save()
             for item in cart:
                 OrderItem.objects.create(
-                                         order = order, 
-                                         product = item['product'], 
-                                         price = item['price'], 
-                                         quantity = item['quantity'])
+                    order=order,
+                    product=item['product'],
+                    price=item['price'],
+                    quantity=item['quantity'])
             cart.clear()
             orders = request.user.orders_count + 1
-            CustomUser.objects.filter(email= request.user.email).update(orders_count=orders)
+            CustomUser.objects.filter(
+                email=request.user.email).update(orders_count=orders)
             return render(request, 'shop/order_created.html', {'order': order})
     else:
         form = OrderForm(initial=initial_dict)
@@ -128,14 +120,15 @@ def order_create(request):
 
 
 def order_detail(request, order_id):
-    current_order = get_object_or_404(Order,
-                                      id=order_id)
+    """функция представления страницы конкретного заказа"""
+    current_order = get_object_or_404(Order, id=order_id)
     delete_order = current_order.delete()
     if delete_order:
         orders = request.user.orders_count - 1
-        CustomUser.objects.filter(email= request.user.email).update(orders_count=orders)
+        CustomUser.objects.filter(
+            email=request.user.email).update(orders_count=orders)
     order_item = OrderItem.objects.filter(order=current_order).all()
-    return render(request, 'shop/order_list.html', {'current_order': current_order,
-                                                    'delete_order': delete_order,
-                                                    'order_item': order_item})
-                
+    return render(request, 'shop/order_list.html',
+                  {'current_order': current_order,
+                   'delete_order': delete_order,
+                   'order_item': order_item})

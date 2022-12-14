@@ -1,12 +1,13 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.core.validators import RegexValidator
-from .models import CustomUser
-
 from django.forms import CharField, EmailField, TextInput, PasswordInput, ValidationError, EmailInput, ModelForm
+
+from .models import CustomUser
 from .validators import Min_Max_Length_Validator
 
 
 class CreatingForm(UserCreationForm):
+    """форма создания пользователя"""
     username = CharField(
         label='Логин',
         widget=TextInput(attrs={'placeholder': 'MyUserName'}),
@@ -43,6 +44,7 @@ class CreatingForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+    """форма авторизации пользователя"""
     username = EmailField(
         label='Адрес электронной почты',
         widget=TextInput(attrs={'placeholder': 'example@gmail.com'}))
@@ -67,6 +69,7 @@ class LoginForm(AuthenticationForm):
 
 
 class UserProfileForm(ModelForm):
+    """форма профиля пользователя"""
     first_name = CharField(
         label='Имя',
         required=False,
@@ -110,4 +113,5 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'second_name', 'phone_number', 'city', 'address', 'postal_code')
+        fields = ('first_name', 'second_name', 'phone_number',
+                  'city', 'address', 'postal_code')
