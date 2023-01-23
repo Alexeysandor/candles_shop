@@ -7,8 +7,8 @@ from users.urls import reset_password
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('shop.urls')),
+    path('', include(reset_password)),
     path('', include('users.urls')),
-    path('', include(reset_password))
 ]
 
 if settings.DEBUG:
