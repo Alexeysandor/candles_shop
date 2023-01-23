@@ -28,6 +28,11 @@ venv/scripts/activate
 ```
 pip install -r requirements.txt
 ```
+- Подключите свою БД в settings.py
+- Выполните миграции
+```
+python manage.py makemigrations
+```
 - В папке с файлом manage.py выполните команду:
 ```
 python3 manage.py runserver
