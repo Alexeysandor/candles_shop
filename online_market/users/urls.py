@@ -8,9 +8,6 @@ from . import views
 
 app_name = 'users'
 
-# создаю пути тут, но использую их в головном views.py,
-# поскольку просто наследую модели и не вижу смысла их переписывать ради того,
-# чтобы использовать здесь
 reset_password = [
     path('password-reset/', PasswordResetView.as_view(
         template_name='users/password_reset_form.html'),
@@ -34,4 +31,5 @@ urlpatterns = [
          name='profile_edit'),
     path('login/', views.loginUser, name='login'),
     path('register_done/', views.RegisterDone.as_view(), name='register_done'),
+    path('reset_password/', include(reset_password))
 ]
