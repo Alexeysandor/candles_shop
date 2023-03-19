@@ -8,7 +8,6 @@ from . import views
 
 app_name = 'users'
 
-
 reset_password = [
     path('password-reset/', PasswordResetView.as_view(
         template_name='users/password_reset_form.html'),
