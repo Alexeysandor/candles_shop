@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Product, Example, Order, OrderItem
+from .models import Cart, CartItem, Example, Order, OrderItem, Product
+
+
+class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'created_at']
+
+
+class CartItemAdmin(admin.ModelAdmin):
+    list_display = ['cart', 'product', 'quantity']
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -15,7 +23,8 @@ class ExampleAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     """модель для просмотра заказов"""
-    list_display = ('id', 'first_name', 'second_name', 'phone_number', 'email', 'address', 'postal_code', 'city', 'order_status',)
+    list_display = ('id', 'first_name', 'last_name', 'phone_number', 'email',
+                    'address', 'postal_code', 'city', 'order_status')
     fields = ('email', 'order_status',)
 
 
@@ -29,3 +38,5 @@ admin.site.register(Example, ExampleAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
+admin.site.register(Cart, CartAdmin)
+admin.site.register(CartItem, CartItemAdmin)

@@ -3,14 +3,18 @@
 {% block title %} Заказ {% endblock %}
 {%block content%}
 <div class="index_page">
+  {% if item_in_order|length < 1 %}
+  <div class="order_title">
+    <p>Вы ещё не начали оформлять заказ</p>
+    <br><a href = {% url 'shop:catalog'%} class='nav__link'> вернуться к просмотру товаров </a>
+    <p> Как только вы заполните корзину, вы сможете оформлять заказ </p>
+  </div>
+    {% else %}
   <div class="block1">
     <form action="." method="post">
       {% csrf_token %}
       {% for fields in form%}
         <br>{{fields.label}}
-        {% if from.errors %}
-          {{ form.email.errors }}
-        {% endif %}
         <br>{{fields}}
       {% endfor %}
       <p> <button type="submit" class="button">
@@ -23,19 +27,20 @@
     <div class="order_title">
       Ваш заказ:
     </div>
-    {% for item in cart %}
+    {% for item in item_in_order %}
       {% with product=item.product %}
       <div class="order_border">
         Название: {{ product.name }} 
-        <br> Количество: {{ product.quantity }}x
-        <br> Количество: {{ product.quantity }}x
-        <br> Количество: {{ item.quantity }}x
-        <br> Количество: {{ item.quantity }}x
-        <br> Количество: {{ item.quantity }}x
-        <br> {{product.description}}
+        <br> Количество: {{ item.quantity }} шт.
+        <br> Описание: {{product.description}}
+        <br> Цена {{product.price}}
       </div>
       {% endwith %}
     {% endfor %}
+    <p> Итоговая цена: {{ total_price }} рублей </p>
+    <a href = {% url 'shop:catalog'%} class='detail_text'> Вернуться к просмотру товаров </a>
+    <br><a href = {% url 'shop:cart_detail'%} class='detail_text'>Вернуться в корзину </a>
   </div>
 </div>
+{% endif %}
 {% endblock %}

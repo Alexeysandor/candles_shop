@@ -22,7 +22,7 @@ class OrderForm(forms.ModelForm):
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': 'Иван'}))
 
-    second_name = forms.CharField(
+    last_name = forms.CharField(
         label='Фамилия',
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': 'Иванов'}))
@@ -31,12 +31,6 @@ class OrderForm(forms.ModelForm):
         label='Номер телефона',
         max_length=50,
         widget=forms.TextInput(attrs={'placeholder': '+79781234567'}))
-
-    email = forms.EmailField(
-        label='Электронная почта',
-        max_length=50,
-        widget=forms.TextInput(attrs={'placeholder': 'example@gmail.com'}),
-        error_messages={'invalid': 'Email: Неверно заполнено'})
 
     city = forms.CharField(
         label='Город',
@@ -55,5 +49,5 @@ class OrderForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ('first_name', 'second_name', 'phone_number', 'email',
+        fields = ('first_name', 'last_name', 'phone_number',
                   'city', 'address', 'postal_code')

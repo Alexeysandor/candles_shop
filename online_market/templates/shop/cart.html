@@ -4,7 +4,7 @@
 {% block content %}
 <div class="main_page">
   <div class="row">
-  {% if request.session.cart|length < 1 %}
+  {% if cart_items|length < 1 %}
   <div class="index_title">
     <p> Ваша корзина пустая </p>
     <p> <a href="{% url "shop:catalog" %}" class="nav__link"> Посмотреть товар </a> </p>
@@ -13,37 +13,44 @@
     <div class="index_title">
       Ваш товар в корзине:
     </div>
-    {% for item in cart %}
-      {% with product=item.product %}
+    {% for item in cart_items %}
       <div class="column">
-        <img src="{{ product.image.url }}" class="border">
-        <p> <b> Название: </b> {{ product.name }} </p>
+        <img src="{{ item.product.image.url }}" class="border">
+        <p> <b> Название: </b> {{ item.product.name }} </p>
         <p> <b>Количество товара в корзине: </b>{{ item.quantity }} </p>
         <p>
-          <a href="{% url "shop:cart_update" item.product.id %}" class="nav__link">Добавить</a>
-          <a href="{% url "shop:cart_remove" item.product.id %}" class="nav__link">Удалить</a>
+          <a href="{% url 'shop:cart_update' item.product.id %}" class="nav__link">Добавить</a>
+          <a href="{% url "shop:cart_remove" item.product.id %}" class="nav__link">Убавить</a>
         </p>
         <div class="header__inner">
-          <p> Цена товара: {{ item.price }} </p>
+          <p> Цена товара: {{ item.product.price }} </p>
           <p>
             {% if  item.quantity == 1 %}
-              Цена за {{item.quantity}} свечу: {{ item.total_price }} 
+              Цена за {{item.quantity}} свечу {{ item.get_total_price }} 
             {% elif  item.quantity <= 4 %}
-              Цена за {{item.quantity}} свечи: {{ item.total_price }}
+              Цена за {{item.quantity}} свечи: {{ item.get_total_price }}
             {% elif item.quantity >= 5%}
-              Цена за {{item.quantity}} свечей: {{ item.total_price }}
+              Цена за {{item.quantity}} свечей: {{ item.get_total_price }}
             {%endif%}
           </p>
         </div>
       </div>
-      {% endwith %}
     {% endfor %}
   </div>
 </div>
 <div class="total_cart">
-  <p> Итоговая цена: {{ cart.get_total_price }} рублей </p>
-  <a href="{% url "shop:order" %}" class="text"> Оформить заказ </a>
+  <a href="{% url 'shop:cart_clear' %}" class="text" onclick="event.preventDefault(); document.getElementById('cart-clear-form').submit();">Очистить корзину</a>
+    <form id="cart-clear-form" method="post" action="{% url 'shop:cart_clear' %}">
+      {% csrf_token %}
+    </form>
+  <p> Итоговая цена: {{ total_price }} рублей </p>
+  <a href="{% url "shop:order_create" %}" class="text"> Оформить заказ </a>
   <a href="{% url "shop:catalog" %}" class="text"> Вернуться в каталог </a>
 </div>
 {% endif %}
+
+{% if is_paginated %}
+{% include 'includes/paginator.html' %}
+{% endif %}
+
 {% endblock %}

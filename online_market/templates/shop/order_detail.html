@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Заказ номер: {{current_order.id}} {% endblock %}
+{% block content %}
+{% for item in order_item%}
+<div class="detail_order">
+    <div class="detail__photo">
+      <img src="{{ item.product.image.url }}" height='200'>
+    </div>
+    <br>{{ item.product.name }}
+    <br>Описание: {{ item.product.description }}
+    <br>Цена: {{ item.product.price }} рублей
+  </div>
+{%endfor%}
+<center><h2><a href="{{ request.user.get_absolute_url }}">Вернуться назад</a></h2></center>
+{% endblock %}
