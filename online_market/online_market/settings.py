@@ -13,18 +13,23 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 from dotenv import load_dotenv
+from django.core.management.utils import get_random_secret_key
+from django.utils.translation import gettext_lazy as _
 
-load_dotenv()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dotenv_path = os.path.join(os.path.dirname(BASE_DIR), "infra/.env")
+
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+
 
 # Constants for project
 PRODUCT_COUNT = 3
-CART_SESSION_ID = 'cart'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": os.getenv('REDIS_HOST', default='redis://127.0.0.1:6379/1'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -32,25 +37,19 @@ CACHES = {
 }
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', default=get_random_secret_key())
 
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
+
+
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '[::1]',
-    'testserver',
+    '*'
 ] 
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-] 
+INTERNAL_IPS = ['127.0.0.1'] 
 
 # Application definition
 
@@ -103,13 +102,13 @@ WSGI_APPLICATION = 'online_market.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'online_market',
-        'USER': 'Admin',
-        'PASSWORD': 'Admin',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+    "default": {
+        "ENGINE": os.getenv("DB_ENGINE", default="django.db.backends.postgresql"),
+        "NAME": os.getenv("DB_NAME", default="my_candles_shop"),
+        "USER": os.getenv("POSTGRES_USER", default="Admin"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", default="Admin"),
+        "HOST": os.getenv("DB_HOST", default="127.0.0.1"),
+        "PORT": os.getenv("DB_PORT", default="5432"),
     }
 }
 
@@ -119,20 +118,17 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {   
-        'NAME': 'users.validators.CustomUserAttributeSimilarityValidator',
-        # 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        # 'NAME': 'users.validators.CustomUserAttributeSimilarityValidator',
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {   
-        'NAME': 'users.validators.CustomMinimumLengthPasswordValidator',
-        # 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'users.validators.CustomCommonPasswordValidator',
-        # 'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'users.validators.CustomNumericPasswordValidator',
-        # 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -140,7 +136,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -155,6 +151,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')] 
 
 MEDIA_URL = '/media/'
@@ -176,4 +173,3 @@ EMAIL_HOST_USER = 'mail@mail.mail'
 EMAIL_HOST_PASSWORD = 'password'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
-

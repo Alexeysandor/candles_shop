@@ -2,15 +2,13 @@ from django.contrib.auth.views import (LogoutView, PasswordResetView,
                                        PasswordResetDoneView,
                                        PasswordResetConfirmView,
                                        PasswordResetCompleteView)
-from django.urls import path, reverse_lazy, include
+from django.urls import include, path, reverse_lazy
 
 from . import views
 
 app_name = 'users'
 
-# создаю пути тут, но использую их в головном views.py,
-# поскольку просто наследую модели и не вижу смысла их переписывать ради того,
-# чтобы использовать здесь
+
 reset_password = [
     path('password-reset/', PasswordResetView.as_view(
         template_name='users/password_reset_form.html'),
@@ -25,14 +23,23 @@ reset_password = [
          name='password_reset_complete')
 ]
 
-urlpatterns = [
-    path('logout/', LogoutView.as_view(template_name='users/logged_out.html'), 
-         name='logout'),
+auth = [
     path('signup/', views.SignUp.as_view(), name='signup'),
-    path('profile/<str:username>/', views.profile, name='profile'),
-    path('profile/<str:username>/edit/', views.profile_edit,
-         name='profile_edit'),
-    path('login/', views.loginUser, name='login'),
     path('register_done/', views.RegisterDone.as_view(), name='register_done'),
-    path('reset_password/', include(reset_password))
+    path('login/', views.LoginUserView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(template_name='users/logged_out.html'),
+         name='logout'),
+]
+
+profile = [
+    path('profile/<str:username>/', views.ProfileView.as_view(),
+         name='profile'),
+    path('profile/<str:username>/edit/', views.ProfileEditView.as_view(),
+         name='profile_edit'),
+]
+
+urlpatterns = [
+    path('', include(auth)),
+    path('', include(profile)),
+    path('reset_password/', include(reset_password)),
 ]

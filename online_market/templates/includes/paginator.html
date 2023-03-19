@@ -1,16 +1,16 @@
 {% load static %}
-{% if product.has_other_pages %}
+{% if page_obj.has_other_pages %}
 <div class="pagination">
   <nav aria-label="Page navigation" class="my-5">
     <div class="text">
-    {% if product.has_previous %}
-        <a class="text" href="?page={{ product.previous_page_number }}">
+    {% if page_obj.has_previous %}
+        <a class="text" href="?page={{ page_obj.previous_page_number }}">
           Предыдущая страница
         </a>
       </li>
     {% endif %}
-    {% if product.has_next %}
-        <a class="text" href="?page={{ product.next_page_number }}">
+    {% if page_obj.has_next %}
+        <a class="text" href="?page={{ page_obj.next_page_number }}">
           Следующая страница
         </a>
       </li>

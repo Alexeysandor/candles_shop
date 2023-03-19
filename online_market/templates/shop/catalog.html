@@ -16,6 +16,7 @@
         {% endfor %}
     </div>
   </div>
-{% include 'includes/paginator.html' %}
-
+  {% if is_paginated %}
+    {% include 'includes/paginator.html' %}
+  {% endif %}
 {%endblock%}

@@ -9,11 +9,20 @@
     <p class="name"> {{ product.name }} </p>
     <p> Описание: {{ product.description }}</p>
     <p class="price">Цена: {{ product.price }} рублей</p>
+    {% if not request.user.is_authenticated %}
+      <a href = {% url 'users:login'%} class='text'> Чтобы добавить товар в корзину, необходимо авторизоваться </a>
+    {% else %}
+    {% if product_in_cart %}
+      <p>Товар уже в корзине
+      <br><a href = {% url 'shop:cart_detail'%}>Перейти в корзину </a> </p>
+    {% else %}
       <form action="{% url "shop:cart_add" product.id %}" method="post">
         {{ cart_product_form }}
         {% csrf_token %}
         <p><input type="submit" value="Добавить в корзину"></p>
       </form>
-    <p class="back"><a href = {% url 'shop:catalog'%} onclick="history.back();" class="detail_text"> Вернуться назад </a></p>
+    {% endif %}
+    {% endif %}
+    <p class="back"><a href = {% url 'shop:catalog'%} class='detail_text'> Вернуться назад </a></p>
   </div>
 {%endblock%}

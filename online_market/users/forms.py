@@ -1,6 +1,8 @@
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.hashers import check_password
 from django.core.validators import RegexValidator
-from django.forms import CharField, EmailField, TextInput, PasswordInput, ValidationError, EmailInput, ModelForm
+from django.forms import (CharField, EmailField, EmailInput, ModelForm,
+                          PasswordInput, TextInput, ValidationError)
 
 from .models import CustomUser
 from .validators import Min_Max_Length_Validator
@@ -20,8 +22,9 @@ class CreatingForm(UserCreationForm):
     email = EmailField(
         label='Адрес электронной почты',
         widget=EmailInput(attrs={'placeholder': 'example@gmail.com'}),
-        error_messages={'unique': 'Пользователь с такой почтой уже существует',
-                        'invalid': 'Введите корректный адрес электронной почты'})
+        error_messages={
+            'unique': 'Пользователь с такой почтой уже существует',
+            'invalid': 'Введите корректный адрес электронной почты'})
 
     password1 = CharField(
         label='Пароль',
@@ -48,23 +51,17 @@ class LoginForm(AuthenticationForm):
     username = EmailField(
         label='Адрес электронной почты',
         widget=TextInput(attrs={'placeholder': 'example@gmail.com'}))
-                    
+
     password = CharField(
         label='Пароль',
         widget=PasswordInput(attrs={'placeholder': '12345678'}))
 
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        username_db = CustomUser.objects.filter(email=username)
-        if not username_db:
-            raise ValidationError('Неверный логин')
-        return username
-
     def clean_password(self):
         password = self.cleaned_data['password']
-        password_db = CustomUser.objects.filter(password=password)
-        if not password_db:
-            raise ValidationError('Неверный пароль')
+        username = self.cleaned_data.get('username')
+        user = CustomUser.objects.filter(email=username).first()
+        if not user or not check_password(password, user.password):
+            raise ValidationError('Неверный логин или пароль')
         return password
 
 
@@ -78,7 +75,7 @@ class UserProfileForm(ModelForm):
                                    'Недопустимые символы'),
                     Min_Max_Length_Validator])
 
-    second_name = CharField(
+    last_name = CharField(
         label='Фамилия',
         required=False,
         widget=TextInput(attrs={'placeholder': 'Иванов'}),
@@ -113,5 +110,5 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'second_name', 'phone_number',
+        fields = ('first_name', 'last_name', 'phone_number',
                   'city', 'address', 'postal_code')

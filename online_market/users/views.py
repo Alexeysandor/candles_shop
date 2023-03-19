@@ -1,63 +1,68 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
+from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DetailView, UpdateView
+from django.views.generic.base import TemplateView
+
 from .forms import CreatingForm, LoginForm, UserProfileForm
 from .models import CustomUser
-from shop.models import Order
-from django.contrib.auth import login
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
-from django.views.generic.base import TemplateView
 
 
 class SignUp(CreateView):
+    template_name = 'users/signup.html'
     form_class = CreatingForm
     success_url = reverse_lazy('users:register_done')
-    template_name = 'users/signup.html'
-
-
-@login_required
-def profile(request, username):
-    current_username = get_object_or_404(CustomUser, username=username)
-
-    order = Order.objects.filter(user=request.user.id).all()
-    return render(request, 'users/profile.html', {'user': current_username,
-                                                  'order': order})
-
-
-def profile_edit(request, username):
-    initial_dict = {
-            'first_name': request.user.first_name,
-            'second_name': request.user.second_name,
-            'phone_number': request.user.phone_number,
-            'city': request.user.city,
-            'address': request.user.address,
-            'postal_code': request.user.postal_code
-        }
-    if request.method == 'POST':
-        instance, created = CustomUser.objects.get_or_create(email=request.user.email)
-        form = UserProfileForm(request.POST, instance=instance)
-        if form.is_valid():
-            form.save()
-            return redirect('users:profile', request.user.username)
-    else:
-        form = UserProfileForm(initial=initial_dict)
-    return render(request, 'users/profile_edit.html', {'form': form})
-
-
-def loginUser(request):
-    if request.user.is_authenticated:
-        return redirect("shop:home")
-    if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            return redirect('users:profile', request.user.username)
-    else:
-        form = LoginForm()
-    return render(request, 'users/login.html', {'form': form})
-
 
 
 class RegisterDone(TemplateView):
     template_name = 'users/register_done.html'
+
+
+class LoginUserView(LoginView):
+    template_name = 'users/login.html'
+    form_class = LoginForm
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile',
+                            args=(self.request.user.username,))
+
+
+class ProfileView(DetailView):
+    model = CustomUser
+    template_name = 'users/profile.html'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    queryset = CustomUser.objects.prefetch_related('orders')
+    paginate_by = settings.PRODUCT_COUNT
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            return redirect(reverse('users:login'))
+        if self.request.user.username != self.kwargs['username']:
+            return redirect(reverse('users:profile',
+                                    args=(request.user.username,)))
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        orders = self.request.user.orders.all()
+        context['order'] = orders
+        return context
+
+
+class ProfileEditView(LoginRequiredMixin, UpdateView):
+    model = CustomUser
+    template_name = 'users/profile_edit.html'
+    form_class = UserProfileForm
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(email=self.request.user.email)
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile',
+                            args=(self.request.user.username,))

@@ -1,22 +1,39 @@
 from django.conf import settings
+from django.urls import include, path
 from django.conf.urls.static import static
-from django.urls import path
 
 from . import views
 
 app_name = 'shop'
 
+cart_path = [
+    path('cart', views.CartView.as_view(), name='cart_detail'),
+    path('add/<product_id>/',
+         views.AddProductToCartView.as_view(), name='cart_add'),
+    path('update/<product_id>/',
+         views.CartProductQuantityUpdateView.as_view(), name='cart_update'),
+    path('remove/<product_id>/',
+         views.CartProductQuantityDecreaseView.as_view(), name='cart_remove'),
+    path('cart/clear/', views.ClearCartView.as_view(), name='cart_clear'),
+]
+
+order_path = [
+    path('order/create/', views.OrderCreateView.as_view(),
+         name='order_create'),
+    path('order/created/', views.OrderCreatedView.as_view(),
+         name='order_created'),
+    path('order/<order_id>/', views.OrderDetailView.as_view(),
+         name='order_detail'),
+]
+
 urlpatterns = [
-    path('', views.index, name='home'),
-    path('product/<slug>/', views.product_detail, name='product_detail'),
-    path('catalog', views.catalog, name='catalog'),
-    path('about_us', views.about_us, name='about_us'),
-    path('cart', views.cart_detail, name='cart_detail'),
-    path('add/<product_id>/', views.cart_add, name='cart_add'),
-    path('remove/<product_id>/', views.cart_remove, name='cart_remove'),
-    path('update/<product_id>/', views.cart_update, name='cart_update'),
-    path('order/', views.order_create, name='order'),
-    path('order/<order_id>/', views.order_detail, name='order_detail'),
+    path('', views.IndexView.as_view(), name='home'),
+    path('catalog', views.CatalogView.as_view(), name='catalog'),
+    path('product/<slug>/', views.ProductDetailView.as_view(),
+         name='product_detail'),
+    path('about_us', views.AboutUsView.as_view(), name='about_us'),
+    path('', include(cart_path)),
+    path('', include(order_path)),
 ]
 
 if settings.DEBUG:
