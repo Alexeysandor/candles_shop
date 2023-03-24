@@ -74,7 +74,7 @@ docker-compose exec web python manage.py loaddata db_dump.json
 sudo docker-compose exec web python manage.py createsuperuser
 ```
 - Сервер будет доступен по адресу:
- - http://localhost/
+  http://localhost/
 - Спецификация API доступна по адресу:
- - http://localhost/redoc/
+  http://localhost/redoc/
 - Автор: Алексей Кузьменко
