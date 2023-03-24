@@ -180,7 +180,6 @@ EMAIL_HOST_PASSWORD = 'password'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 
-
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'rest_framework.authentication.TokenAuthentication',
@@ -190,12 +189,12 @@ DJOSER = {
     'HIDE_USERS': False,
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserRegistrationSerializer',
-        'user': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
+        'user': 'api.serializers.UserListSerializer',
+        'current_user': 'api.serializers.CurrentUserSerializer',
     },
     'PERMISSIONS': {
-        'user': ['rest_framework.permissions.IsAuthenticated'],
-        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['api.permissions.IsAuthorOrAdmin'],
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
     },
 }
 
