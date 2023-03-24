@@ -1,0 +1,829 @@
+openapi: 3.0.0
+info:
+  title: Документация API
+  description: Описание эндпоинтов моего пет проекта
+  version: 1.0.0
+
+components:
+  parameters:
+    PageNumber:
+      name: Номер страницы
+      required: false
+      in: query
+      description: Номер страницы.
+      schema:
+        type: integer
+    ObjCount:
+      name: Количество объектов на странице.
+      required: false
+      in: query
+      description: Количество объектов на странице.
+      schema:
+        type: integer
+      
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          description: Название поля, в котором произошли ошибки.
+          items:
+            type: string
+            example: Данные указаны не верно
+    UserInfoWithOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID пользователя
+        first_name:
+          type: string
+          description: Имя
+        last_name:
+          type: string
+          description: Фамилия
+        username:
+          type: string
+          description: Никнейн
+        email:
+          type: string
+          description: Почта
+        phone_number:
+          type: string
+          nullable: true
+          description: Номер телефона
+        city:
+          type: string
+          nullable: true
+          description: Город
+        address:
+          type: string
+          nullable: true
+          description: Адрес
+        postal_code:
+          type: string
+          nullable: true
+          description: Почтовый индекс
+        orders:
+          type: array
+          description: ID и статус заказа
+          items:
+            type: object
+            properties:
+              order_id:
+                type: integer
+                description: ID заказа
+              order_status:
+                type: string
+                description: Статус заказа
+    ProductInfo:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+          description: 'Общее количество товара в базе'
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://127.0.0.1:8000/api/users/?page=3
+          description: 'Ссылка на следующую страницу'
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://127.0.0.1:8000/api/users/?page=1
+          description: 'Ссылка на предыдущую страницу'
+        result:
+          type: array
+          description: 'Список товаров'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: ID товара
+              name:
+                type: string
+                description: Название товара
+              description:
+                type: string
+                description: Описание товара
+              image:
+                type: string
+                format: url
+                description: Фото товара
+              price:
+                type: number
+                description: Цена товара
+    Product_in_cart_or_order:
+      type: object
+      properties:
+        product_in:
+          type: array
+          description: Товары в заказе
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Название товара
+              description:
+                type: string
+                description: Описание товара
+              image:
+                type: string
+                format: url
+                description: Фото товара
+              price:
+                type: number
+                description: Цена товара
+              quantity:
+                type: integer
+                description: Количество товара
+              product_sum_price:
+                type: number
+                description: Цена за весь данный товар
+        total_price:
+                type: number
+                description: Итоговая цена покупки   
+    UnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: "Описание ошибки"
+          example: "Токен не предоставлен"
+    NotFoundError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: "Описание ошибки"
+          example: "обьект с таким ID не найден"
+  securitySchemes:
+    djoserToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'Авторизация по токену. <br>
+        Все запросы от имени пользователя должны выполняться с заголовком "Authorization: Token TOKENVALUE"'
+
+
+tags:
+  - name: Пользователи
+    description: Пользователи
+  - name: Товары
+    description: Товары
+  - name: Корзина
+    description: Корзина
+  - name: Заказы
+    description: Заказы
+    
+servers:
+  - url: http://127.0.0.1:8000/api
+paths:
+  /users:
+    get:
+      tags:
+      - Пользователи
+      summary: Получить список пользователей
+      security:
+        - djoserToken: []
+      description: Страница доступна только администратору
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/ObjCount'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                    description: 'Общее количество пользователей в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://127.0.0.1:8000/api/users/?page=3
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://127.0.0.1:8000/api/users/?page=1
+                    description: 'Ссылка на предыдущую страницу'
+                  result:
+                    type: array
+                    description: 'Базовая информация о пользователе и количество его заказов'
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: ID пользователя
+                        first_name:
+                          type: string
+                          description: Имя пользователя
+                        last_name:
+                          type: string
+                          description: Фамилия пользователя
+                        email:
+                          type: string
+                          description: Почта пользователя
+                        orders_count:
+                          type: integer
+                          description: Количество заказов пользователя
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+    post:
+      tags:
+      - Пользователи
+      summary: Создать пользователя
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Уникальный никнейн
+                email:
+                  type: string
+                  description: Уникальная почта
+                password:
+                  type: string
+                  description: Пароль
+              required:
+                - username
+                - email
+                - password
+
+      responses:
+        '201':
+          description: Пользователь создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID пользователя
+                  username:
+                    type: string
+                    description: Никнейм
+                  email:
+                    type: string
+                    description: Почта
+                  password:
+                    type: string
+                    description: Пароль
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  
+  /users/{id}:  
+    get:
+      tags:
+      - Пользователи
+      summary: Страница пользователя
+      security:
+        - djoserToken: []
+      description: Страница доступна только администратору и владельцу страницы
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор пользователя."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoWithOrder'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /users/me/:
+    get:
+      tags:
+        - Пользователи
+      summary: Информация о текущем пользователе
+      security:
+        - djoserToken: []
+      description: Страница доступна авторизованному пользователю
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoWithOrder'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+  /auth/token/login/:
+    post:
+      tags:
+        - Пользователи
+      summary: Получение токена
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Почта
+                password:
+                  type: string
+                  description: Пароль
+              required:
+                - email
+                - password
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Токен
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /auth/token/logout/:
+    post:
+      tags:
+        - Пользователи
+      summary: Удаление токена
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+      responses:
+        '204':
+          description: Токен удалён
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+  /users/set_password:
+    post:
+      tags:
+        - Пользователи
+      summary: Сменить пароль
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                  description: Старый пароль
+                new_possword:
+                  type: string
+                  description: Новый пароль
+              required:
+                - old_password
+                - new_possword
+      responses:
+        '204':
+          description: Пароль успешно изменён
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+  /product/:
+    get:
+      tags:
+        - Товары
+      summary: Список продуктов
+      parameters:
+        - $ref: '#/components/parameters/PageNumber'
+        - $ref: '#/components/parameters/ObjCount'
+      description: Страница доступна всем пользователям
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductInfo'
+  /product/{id}/:
+    get:
+      tags:
+        - Товары
+      summary: Страница товара
+      description: Страница доступна всем пользователям
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: ID товара
+              name:
+                type: string
+                description: Название товара
+              description:
+                type: string
+                description: Описание товара
+              image:
+                type: string
+                format: url
+                description: Фото товара
+              price:
+                type: number
+                description: Цена товара
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductInfo'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    post:
+      tags:
+        - Товары
+      summary: Добавить товар в корзину
+      security:
+        - djoserToken: []
+      description: Страница доступна авторизованному пользователю
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Товар добавлен в корзину"    
+        '400':
+          description: Add error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Товар уже в добавлен в корзину"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    delete:
+      tags:
+        - Товары
+      summary: удалить товар из корзины
+      security:
+        - djoserToken: []
+      description: Страница доступна авторизованному пользователю
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully delete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Товар удалён из корзины"    
+        '400':
+          description: Add error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Товара уже нет в корзине"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /cart/:
+    get:
+      tags:
+        - Корзина
+      summary: Страница корзины
+      security:
+        - djoserToken: []
+      description: Страница доступна авторизированному пользователю
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product_in_cart_or_order'
+    delete:
+      tags:
+       - Корзина
+      summary: Очистить корзину
+      security:
+        - djoserToken: []
+      description: Доступно авторизированному пользователю
+      responses:
+        '204':
+          description: Корзина очищена             
+  /cart/{product_id}/edit_product_quantity/:
+    patch:
+      tags:
+        - Корзина
+      summary: Изменить количество определенного товара в корзине
+      security:
+        - djoserToken: []
+      description: Доступно авторизированному пользователю
+      parameters:
+        - name: product_id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: Количество товара успешно обновлено
+                    example: "Количество товара {name} успешно обновлено"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Проверьте что ввели целое цисло"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /order/{id}/:
+    get:
+      tags:
+        - Заказы
+      summary: Посмотреть информацию о заказе
+      security:
+        - djoserToken: []
+      description: Доступно админу или владельцу профиля
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product_in_cart_or_order'                    
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+    delete:
+      tags:
+        - Заказы
+      summary: Удаление заказа
+      security:
+        - djoserToken: []
+      description: Доступно авторизированному пользователю, который создал заказ
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: "Уникальный идентификатор Продукта."
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully delete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Заказ успешно удалён"
+        '400':
+          description: Delete Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Нельзя вручную удалить заказ, статус котором сменился с 'Заказ оформлен'"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+  /order/create/:
+    post:
+      tags:
+        - Заказы
+      summary: Создание заказа
+      security:
+        - djoserToken: []
+      description: Доступно авторизированному пользователю
+      responses:
+        '201':
+          description: Successfully Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: ID пользователя
+                  first_name:
+                    type: string
+                    description: Имя
+                  last_name:
+                    type: string
+                    description: Фамилия
+                  username:
+                    type: string
+                    description: Никнейн
+                  email:
+                    type: string
+                    description: Почта
+                  phone_number:
+                    type: string
+                    nullable: true
+                    description: Номер телефона
+                  city:
+                    type: string
+                    nullable: true
+                    description: Город
+                  address:
+                    type: string
+                    nullable: true
+                    description: Адрес
+                  postal_code:
+                    type: string
+                    nullable: true
+                    description: Почтовый индекс
+                  Product_in_cart_or_order:
+                    $ref: '#/components/schemas/Product_in_cart_or_order'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    description: "detail"
+                    example: "Нет товара в корзине, невозможно создать заказ"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'        

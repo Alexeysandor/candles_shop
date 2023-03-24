@@ -61,13 +61,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'debug_toolbar',
+    'corsheaders',
+    'rest_framework.authtoken',
+    'rest_framework',
+    'djoser',
     'shop.apps.ShopConfig',
     'users.apps.UsersConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,6 +81,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+# CORS_ALLOWED_ORIGINS = [    "http://localhost:8080", "http://127.0.0.1:8080",]
+
 
 ROOT_URLCONF = 'online_market.urls'
 
@@ -173,3 +181,31 @@ EMAIL_HOST_USER = 'mail@mail.mail'
 EMAIL_HOST_PASSWORD = 'password'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'rest_framework.authentication.TokenAuthentication',
+]
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
+    'SERIALIZERS': {
+        'user_create': 'api.serializers.UserRegistrationSerializer',
+        'user': 'api.serializers.UserSerializer',
+        'current_user': 'api.serializers.UserSerializer',
+    },
+    'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticated'],
+        'user_list': ['rest_framework.permissions.AllowAny'],
+    },
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 3,
+}
