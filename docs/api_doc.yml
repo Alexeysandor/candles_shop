@@ -67,6 +67,7 @@ components:
           description: Почтовый индекс
         orders:
           type: array
+          nullable: true
           description: ID и статус заказа
           items:
             type: object
@@ -149,6 +150,13 @@ components:
         total_price:
                 type: number
                 description: Итоговая цена покупки   
+    NoPermission:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: "Описание ошибки"
+          example: "У вас недостаточно прав для выполнения данного действия."
     UnauthorizedError:
       type: object
       properties:
@@ -231,9 +239,11 @@ paths:
                           description: ID пользователя
                         first_name:
                           type: string
+                          nullable: true
                           description: Имя пользователя
                         last_name:
                           type: string
+                          nullable: true
                           description: Фамилия пользователя
                         email:
                           type: string
@@ -247,6 +257,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoPermission'
     post:
       tags:
       - Пользователи
@@ -327,6 +343,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoPermission'
         '404':
           description: Not Found
           content:
@@ -624,7 +646,7 @@ paths:
       summary: Очистить корзину
       security:
         - djoserToken: []
-      description: Доступно авторизированному пользователю
+      description: Страница доступна авторизированному пользователю
       responses:
         '204':
           description: Корзина очищена             
@@ -635,7 +657,7 @@ paths:
       summary: Изменить количество определенного товара в корзине
       security:
         - djoserToken: []
-      description: Доступно авторизированному пользователю
+      description: Страница доступна авторизированному пользователю
       parameters:
         - name: product_id
           in: path
@@ -706,6 +728,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoPermission'
         '404':
           description: Not Found
           content:
@@ -755,6 +783,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError' 
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoPermission'
         '404':
           description: Not Found
           content:
