@@ -19,6 +19,7 @@
 - Python 3.7
 - Django 3.0
 - Django Rest Framework 3.13.1
+- Djoser==2.1.0
 - Redis 4.3
 - Docker
 ### Локальный запуск:
