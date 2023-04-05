@@ -47,7 +47,6 @@ class Product(models.Model):
 class Cart(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=timezone.now)
-
     class Meta:
         verbose_name = 'Корзина'
         verbose_name_plural = 'Корзины'
@@ -64,6 +63,9 @@ class Cart(models.Model):
     def has_product(self, product):
         return self.cartitem_set.filter(product=product).exists()
 
+    def remove_product(self, product):
+        cart_item = self.cartitem_set.get(product=product)
+        cart_item.delete()
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
